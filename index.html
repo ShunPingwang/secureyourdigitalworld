@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>การจัดการความปลอดภัยในโลกดิจิทัล | Digital Security</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Changed font to Anuphan -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      /* Add smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        /* Changed font to Anuphan */
+        font-family: "Anuphan", sans-serif;
+        background-color: #0a0a1a;
+        color: #e0e0e0;
+        overflow-x: hidden;
+        padding-top: 72px; /* Add padding to body to offset fixed header */
+      }
+      #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+      .hero-section {
+        min-height: calc(100vh - 72px); /* Adjust hero height for header */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .typewriter-cursor {
+        display: inline-block;
+        width: 3px;
+        height: 1.2em;
+        background-color: #00f2ea;
+        animation: blink 0.7s infinite;
+        margin-left: 5px;
+        vertical-align: middle;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      .card {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 242, 234, 0.2);
+        cursor: pointer;
+      }
+      .card-icon {
+        font-size: 3rem;
+        color: #00f2ea;
+      }
+      .scroll-down {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #00f2ea;
+        animation: bounce 2s infinite;
+        transition: opacity 0.5s ease-out;
+        z-index: 50;
+      }
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-20px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+      }
+
+      /* Add scroll-margin-top to section targets to offset fixed header */
+      section[id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s;
+      }
+      .modal-content {
+        background-color: #1a1a2e;
+        margin: 5% auto;
+        padding: 2rem;
+        border: 1px solid #00f2ea;
+        width: 90%;
+        max-width: 650px;
+        border-radius: 1rem;
+        position: relative;
+        animation: slideIn 0.4s;
+      }
+      .close-btn {
+        color: #aaa;
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 28px;
+        font-weight: bold;
+        transition: color 0.2s;
+      }
+      .close-btn:hover,
+      .close-btn:focus {
+        color: #00f2ea;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Scroll Animation */
+      .reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Interactive Modal Styles */
+      .option-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid rgba(0, 242, 234, 0.5);
+        background-color: transparent;
+        color: #e0e0e0;
+        text-align: left;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s, border-color 0.3s;
+        cursor: pointer;
+      }
+      .option-btn:hover {
+        background-color: rgba(0, 242, 234, 0.1);
+        border-color: #00f2ea;
+      }
+      .feedback-correct {
+        border-color: #2dd4bf; /* Teal-400 */
+        background-color: rgba(45, 212, 191, 0.1);
+        color: #a7f3d0; /* Emerald-200 */
+      }
+      .feedback-incorrect {
+        border-color: #f87171; /* Red-400 */
+        background-color: rgba(248, 113, 113, 0.1);
+        color: #fecaca; /* Red-200 */
+      }
+      /* Audio Player Style */
+      /* This filter styles the default audio player to match the cyan theme */
+      audio {
+        filter: invert(93%) sepia(30%) saturate(6011%) hue-rotate(106deg)
+          brightness(101%) contrast(101%);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900">
+    <canvas id="particles-js"></canvas>
+
+    <!-- ===== Updated Header ===== -->
+    <header class="fixed top-0 left-0 w-full bg-white z-40 shadow-lg">
+      <nav
+        class="container mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <!-- Left: Logos -->
+        <a
+          href="https://futurex.sau.ac.th/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center space-x-2 flex-shrink-0"
+        >
+          <img
+            src="https://cdn.prod.website-files.com/6706e793555b896f25d95e70/6706ff24a3019801bbdcbb41_Screenshot%202024-10-09%20at%206.09.16%20PM.avif"
+            alt="SAU Logo"
+            class="h-8 w-auto"
+          />
+          <img
+            src="https://cdn.prod.website-files.com/6706e793555b896f25d95e70/671694390edd990dde16ea4b_FutureX.svg"
+            alt="FutureX Logo"
+            class="h-6 w-auto"
+            style="border-left: 2px solid #000; padding-left: 8px"
+          />
+        </a>
+
+        <!-- Right: Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-6">
+          <a
+            href="#video-overview"
+            class="text-gray-700 hover:text-blue-600 font-medium transition"
+            >Overview</a
+          >
+          <a
+            href="#cyber-abuse"
+            class="text-gray-700 hover:text-blue-600 font-medium transition"
+            >Abuse</a
+          >
+          <a
+            href="#cyber-threat"
+            class="text-gray-700 hover:text-blue-600 font-medium transition"
+            >Threat</a
+          >
+          <a
+            href="#security-best-practices"
+            class="text-gray-700 hover:text-blue-600 font-medium transition"
+            >Best Practices</a
+          >
+          <a
+            href="#technical-deep-dive"
+            class="text-gray-700 hover:text-blue-600 font-medium transition"
+            >Deep Dive</a
+          >
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button
+            id="mobile-menu-button"
+            class="text-gray-800 focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+        <a
+          href="#video-overview"
+          class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition nav-link-mobile"
+          >Overview</a
+        >
+        <a
+          href="#cyber-abuse"
+          class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition nav-link-mobile"
+          >Abuse</a
+        >
+        <a
+          href="#cyber-threat"
+          class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition nav-link-mobile"
+          >Threat</a
+        >
+        <a
+          href="#security-best-practices"
+          class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition nav-link-mobile"
+          >Best Practices</a
+        >
+        <a
+          href="#technical-deep-dive"
+          class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition nav-link-mobile"
+          >Deep Dive</a
+        >
+      </div>
+    </header>
+    <!-- ===== End Updated Header ===== -->
+
+    <main class="relative z-10">
+      <!-- Hero Section -->
+      <section class="hero-section flex-col px-4">
+        <h1
+          id="typewriter-h1"
+          class="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600"
+        ></h1>
+        <p class="text-lg md:text-xl text-gray-300 max-w-3xl">
+          ภัยคุกคามในโลกออนไลน์มีอยู่รอบตัวเรา มาเรียนรู้วิธีป้องกันและรับมือ
+          เพื่อให้คุณท่องโลกดิจิทัลได้อย่างมั่นใจและปลอดภัย
+        </p>
+        <div id="scroll-down-arrow" class="scroll-down mt-16 text-2xl">
+          <!-- Added ID -->
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </section>
+
+      <!-- Content Sections -->
+      <div class="container mx-auto px-6 py-20">
+        <!-- Video Overview Section -->
+        <section id="video-overview" class="mb-20">
+          <div
+            class="reveal max-w-4xl mx-auto bg-black/20 p-2 rounded-lg shadow-lg shadow-cyan-500/20"
+          >
+            <div class="relative" style="padding-top: 56.25%">
+              <!-- 16:9 Aspect Ratio -->
+              <video
+                class="absolute top-0 left-0 w-full h-full rounded-md"
+                controls
+                autoplay
+                muted
+              >
+                <source src="video/overview_digital.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Cyber Abuse -->
+        <section id="cyber-abuse" class="mb-20">
+          <div class="text-center mb-12 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2">
+              การล่วงละเมิดทางไซเบอร์ (Cyber Abuse)
+            </h2>
+            <p class="text-gray-400">
+              พฤติกรรมที่เป็นอันตราย
+              หรือสร้างความเสียหายต่อผู้อื่นผ่านโลกออนไลน์
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              data-title="การระรานทางไซเบอร์ (Cyberbullying)"
+              data-mp3="podcast/Cyberbullying.m4a"
+              data-content="คือการใช้เทคโนโลยีเพื่อกลั่นแกล้ง, ให้ร้าย, หรือรังแกผู้อื่นซ้ำๆ อาจมาในรูปแบบของการโพสต์ข้อความหยาบคาย, เผยแพร่ข่าวลือ, หรือตัดต่อภาพไปในทางเสียหาย ตัวอย่างเช่น เพื่อนร่วมห้องเอารูปของคุณไปโพสต์ในกลุ่มโซเชียลพร้อมเขียนข้อความล้อเลียนปมด้อย ทำให้คนอื่นเข้ามาแสดงความเห็นในทางลบมากมาย"
+              data-scenario="ถ้าคุณเห็นเพื่อนถูก Cyberbullying ในกลุ่มแชต คุณจะทำอย่างไร?"
+              data-options='[
+                            {"label": "พิมพ์ข้อความปกป้องเพื่อนทันที", "correct": false, "feedback": "การตอบโต้ทันทีอาจทำให้สถานการณ์บานปลาย ลองใช้วิธีอื่นที่ดีกว่า"},
+                            {"label": "แคปหน้าจอเก็บหลักฐาน แล้วรายงานผู้ดูแล", "correct": true, "feedback": "ถูกต้อง! การเก็บหลักฐานและรายงานเป็นวิธีที่เหมาะสมที่สุดในการหยุดพฤติกรรมและปกป้องเพื่อนของคุณ"},
+                            {"label": "ทำเป็นไม่เห็นและออกจากกลุ่ม", "correct": false, "feedback": "การเพิกเฉยอาจทำให้ผู้กระทำได้ใจและสถานการณ์แย่ลง การช่วยเหลือเพื่อนเป็นสิ่งสำคัญ"}
+                        ]'
+            >
+              <i class="fas fa-comment-slash card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Cyberbullying</h3>
+              <p class="text-gray-400 text-sm">
+                การกลั่นแกล้ง ให้ร้าย ด่าว่า หรือรังแกผู้อื่น
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 100ms"
+              data-title="การรังควานทางไซเบอร์ (Cyber Harassment)"
+              data-mp3="podcast/Cyber_Harassment.m4a"
+              data-content="เป็นการล่วงละเมิดที่รุนแรงและต่อเนื่อง อาจรวมถึงการส่งข้อความคุกคาม, การใช้คำพูดแสดงความเกลียดชัง (Hate Speech) หรือการเผยแพร่ข้อมูลส่วนตัวเพื่อทำให้เกิดความอับอาย (Doxing) ตัวอย่างเช่น แฟนเก่าที่ไม่ยอมเลิกรา ส่งข้อความข่มขู่คุณทุกวัน และนำเบอร์โทรศัพท์ของคุณไปโพสต์ในเว็บที่ไม่เหมาะสม"
+              data-scenario="หากมีคนแปลกหน้าส่งข้อความคุกคามคุณอย่างต่อเนื่อง คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "บล็อกผู้ใช้นั้นและตั้งค่าบัญชีเป็นส่วนตัว", "correct": true, "feedback": "ยอดเยี่ยม! การบล็อกและตั้งค่าความเป็นส่วนตัวเป็นด่านแรกที่สำคัญที่สุดในการป้องกันตัวเอง"},
+                            {"label": "ด่ากลับไปด้วยถ้อยคำที่รุนแรงกว่า", "correct": false, "feedback": "การตอบโต้ด้วยความรุนแรงอาจเป็นการยั่วยุและทำให้สถานการณ์แย่ลง"},
+                            {"label": "ลบบัญชีโซเชียลมีเดียทิ้ง", "correct": false, "feedback": "เป็นทางออกหนึ่ง แต่ลองบล็อกและรายงานก่อน ซึ่งอาจเพียงพอโดยที่คุณไม่ต้องลบบัญชี"}
+                        ]'
+            >
+              <i class="fas fa-bomb card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Cyber Harassment</h3>
+              <p class="text-gray-400 text-sm">
+                การล่วงละเมิดที่รุนแรงและต่อเนื่องกว่า
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 200ms"
+              data-title="การสะกดรอยตามทางไซเบอร์ (Cyberstalking)"
+              data-mp3="podcast/Cyberstalking.m4a"
+              data-content="คือการใช้เทคโนโลยีเพื่อสอดแนม, ติดตาม หรือเฝ้าดูบุคคลอื่นอย่างต่อเนื่องจนทำให้เกิดความกลัวและรู้สึกไม่ปลอดภัย อาจเป็นการติดตามทุกโพสต์, เช็กอินทุกที่, หรือพยายามแฮกเข้าบัญชีส่วนตัว ตัวอย่างเช่น บุคคลที่คุณเพิ่งปฏิเสธการออกเดท สร้างบัญชีปลอมหลายบัญชีเพื่อมาคอมเมนต์ทุกโพสต์และทุกรูปของคุณ"
+              data-scenario="คุณสังเกตว่ามีบัญชีที่ไม่รู้จักคอยตามกดไลก์และคอมเมนต์ทุกโพสต์ของคุณ คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "โพสต์ข้อความถามไปเลยว่าเป็นใคร", "correct": false, "feedback": "การทำแบบนี้อาจเป็นการเปิดช่องให้ผู้สะกดรอยตามมีปฏิสัมพันธ์กับคุณมากขึ้น ซึ่งอาจไม่ปลอดภัย"},
+                            {"label": "บล็อกบัญชีนั้นและตรวจสอบการตั้งค่าความเป็นส่วนตัว", "correct": true, "feedback": "ถูกต้อง! นี่คือวิธีที่ดีที่สุดในการตัดการเชื่อมต่อและป้องกันไม่ให้เขาเห็นกิจกรรมของคุณอีก"},
+                            {"label": "ไม่ทำอะไร เพราะอาจจะแค่เป็นแฟนคลับ", "correct": false, "feedback": "การระวังไว้ก่อนดีกว่าแก้ การสะกดรอยตามอาจเป็นสัญญาณของอันตรายได้"}
+                        ]'
+            >
+              <i class="fas fa-user-secret card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Cyberstalking</h3>
+              <p class="text-gray-400 text-sm">
+                การสอดแนม ติดตามการเคลื่อนไหวซ้ำๆ
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 300ms"
+              data-title="การเกรียน (Trolling)"
+              data-mp3="podcast/Trolling.m4a"
+              data-content="คือการจงใจโพสต์ข้อความยั่วยุ, ก้าวร้าว, หรือไม่เกี่ยวข้องกับหัวข้อ เพื่อทำให้เกิดความขัดแย้งและอารมณ์เสียในชุมชนออนไลน์ Trolls มักจะมีความสุขกับการเห็นคนอื่นทะเลาะกัน ตัวอย่างเช่น ในกระทู้ที่คนกำลังคุยเรื่องสัตว์เลี้ยงอย่างมีความสุข มีคนเข้ามาคอมเมนต์ว่า 'คนที่เลี้ยงหมาในคอนโดคือคนเห็นแก่ตัว' เพื่อจุดประเด็นให้เกิดการโต้เถียง"
+              data-scenario="เมื่อเจอ Troll ในคอมเมนต์ใต้โพสต์ของคุณ คุณควรรับมืออย่างไร?"
+              data-options='[
+                            {"label": "อธิบายด้วยเหตุผลยาวๆ เพื่อให้เขาเข้าใจ", "correct": false, "feedback": "Troll ไม่ได้ต้องการเหตุผล แต่ต้องการความสนใจ การตอบโต้คือการให้อาหารพวกเขา"},
+                            {"label": "Don&apos;t feed the troll: ไม่ตอบโต้, ลบคอมเมนต์, และบล็อก", "correct": true, "feedback": "สมบูรณ์แบบ! การไม่ให้ความสนใจ (Don&apos;t feed the troll) เป็นวิธีรับมือที่ดีที่สุด"},
+                            {"label": "ชวนเพื่อนมารุมด่ากลับ", "correct": false, "feedback": "วิธีนี้จะทำให้สถานการณ์แย่ลงและอาจเปลี่ยนคุณให้กลายเป็นส่วนหนึ่งของปัญหา"}
+                        ]'
+            >
+              <i class="fas fa-fire card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Trolling</h3>
+              <p class="text-gray-400 text-sm">
+                การจงใจโพสต์ยั่วยุให้เกิดความขัดแย้ง
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Cyber Threat -->
+        <section id="cyber-threat" class="mb-20">
+          <div class="text-center mb-12 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2">
+              ภัยคุกคามทางไซเบอร์ (Cyber Threat)
+            </h2>
+            <p class="text-gray-400">
+              การกระทำโดยมิชอบที่มุ่งร้ายต่อข้อมูลหรือระบบคอมพิวเตอร์ของคุณ
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              data-title="ฟิชชิง (Phishing)"
+              data-mp3="podcast/Phishing.m4a"
+              data-content="การหลอกลวงเพื่อขโมยข้อมูลส่วนตัว เช่น รหัสผ่าน หรือข้อมูลบัตรเครดิต โดยปลอมเป็นหน่วยงานที่น่าเชื่อถือ เช่น ธนาคาร, โซเชียลมีเดีย, หรือบริการอีเมล แล้วส่งลิงก์ปลอมมาให้กรอกข้อมูล ตัวอย่างเช่น คุณได้รับอีเมลที่อ้างว่ามาจาก 'Faceboook' (สะกดผิด) บอกว่าบัญชีของคุณจะถูกระงับ ให้คลิกลิงก์เพื่อยืนยันตัวตนด่วน ซึ่งลิงก์นั้นนำไปสู่หน้าเว็บปลอมที่หน้าตาเหมือน Facebook จริง"
+              data-scenario="คุณได้รับ SMS แจ้งว่า 'คุณได้รับ 100,000 พอยต์ คลิกเพื่อแลกรับรางวัล' พร้อมลิงก์แปลกๆ คุณจะทำอย่างไร?"
+              data-options='[
+                            {"label": "รีบคลิกทันที กลัวของรางวัลหมด", "correct": false, "feedback": "อันตราย! นี่เป็นกลอุบายทั่วไปของ Phishing การคลิกลิงก์ที่ไม่รู้จักเสี่ยงต่อการถูกขโมยข้อมูล"},
+                            {"label": "ลบข้อความทิ้งไป ไม่สนใจ", "correct": true, "feedback": "เป็นการตัดสินใจที่ถูกต้องและปลอดภัยที่สุด! หากไม่ได้คาดหวังว่าจะได้รับรางวัล การเพิกเฉยต่อข้อความน่าสงสัยเป็นวิธีที่ดีที่สุด"},
+                            {"label": "ส่งต่อให้เพื่อน เผื่อเพื่อนอยากได้", "correct": false, "feedback": "ไม่ควรทำ! การส่งต่ออาจทำให้เพื่อนของคุณตกเป็นเหยื่อแทน"}
+                        ]'
+            >
+              <i class="fas fa-fish card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Phishing</h3>
+              <p class="text-gray-400 text-sm">
+                การหลอกลวงให้คลิกลิงก์หรือกรอกข้อมูลส่วนตัว
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 100ms"
+              data-title="มัลแวร์ (Malware)"
+              data-mp3="podcast/Malware.m4a"
+              data-content="ย่อมาจาก Malicious Software เป็นโปรแกรมที่ออกแบบมาเพื่อสร้างความเสียหายหรือขโมยข้อมูล มีหลายชนิด เช่น ไวรัส (แพร่เชื้อไปไฟล์อื่น), เวิร์ม (จำลองตัวเองไปตามเครือข่าย), โทรจัน (แฝงตัวมากับโปรแกรมอื่น), และสปายแวร์ (แอบเก็บข้อมูลการใช้งาน) ตัวอย่างเช่น คุณดาวน์โหลดโปรแกรมฟรีจากเว็บที่ไม่น่าเชื่อถือ เมื่อติดตั้งแล้ว คอมพิวเตอร์ของคุณเริ่มทำงานช้าลงและมีโฆษณาแปลกๆ เด้งขึ้นมาตลอดเวลา"
+              data-scenario="เพื่อนส่งไฟล์เกมมาให้ในแชต แต่โปรแกรมแอนตี้ไวรัสของคุณแจ้งเตือนว่าเป็นไฟล์อันตราย คุณจะทำอย่างไร?"
+              data-options='[
+                            {"label": "ปิดแอนตี้ไวรัสแล้วเปิดไฟล์ เพราะเชื่อใจเพื่อน", "correct": false, "feedback": "ไม่ควรทำ! แม้จะมาจากเพื่อน บัญชีของเพื่อนอาจถูกแฮกและใช้เป็นเครื่องมือแพร่มัลแวร์ได้"},
+                            {"label": "เชื่อคำเตือนของแอนตี้ไวรัสและลบไฟล์ทิ้ง", "correct": true, "feedback": "ฉลาดมาก! โปรแกรมแอนตี้ไวรัสคือปราการด่านสำคัญ ควรเชื่อคำเตือนและแจ้งเพื่อนให้ทราบด้วย"},
+                            {"label": "ถามเพื่อนว่าไฟล์ปลอดภัยไหม", "correct": false, "feedback": "อาจเป็นทางเลือกที่ดี แต่ก็ยังเสี่ยงเพราะเพื่อนอาจไม่รู้ว่าไฟล์นั้นมีมัลแวร์แฝงอยู่"}
+                        ]'
+            >
+              <i class="fas fa-virus card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Malware</h3>
+              <p class="text-gray-400 text-sm">
+                โปรแกรมที่ออกแบบมาเพื่อสร้างความเสียหาย
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 200ms"
+              data-title="ภัยจากการชอปปิงออนไลน์"
+              data-mp3="podcast/Shopping.m4a"
+              data-content="การหลอกลวงที่เกิดขึ้นระหว่างการซื้อขายสินค้าออนไลน์ เช่น การสร้างร้านค้าปลอมบนโซเชียลมีเดีย, ขายสินค้าไม่ตรงปก, หรือหลอกให้โอนเงินแล้วไม่ส่งของ ตัวอย่างที่พบบ่อยคือ เพจขายสินค้าราคาถูกกว่าปกติมาก แต่บังคับให้โอนเงินเต็มจำนวนเท่านั้น และไม่มีบริการเก็บเงินปลายทาง หลังจากโอนเงินแล้วก็ไม่สามารถติดต่อได้อีก"
+              data-scenario="คุณเจอร้านค้าใน IG ขายของที่อยากได้ในราคาถูกกว่าตลาดครึ่งหนึ่ง แต่ร้านมีผู้ติดตามน้อยและรีวิวไม่ชัดเจน คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "รีบโอนเงินเลย กลัวของหมด", "correct": false, "feedback": "ใจเย็นก่อน! ราคาที่ถูกเกินจริงเป็นสัญญาณเตือนของมิจฉาชีพ การรีบร้อนอาจทำให้เสียเงินฟรี"},
+                            {"label": "ขอดูรีวิวเพิ่มเติมหรือขอนัดรับสินค้า", "correct": true, "feedback": "ถูกต้อง! การตรวจสอบเพิ่มเติมเป็นสิ่งสำคัญ หากร้านค้าบ่ายเบี่ยงหรือไม่ให้ความร่วมมือ ก็ไม่ควรเสี่ยงซื้อ"},
+                            {"label": "ต่อราคาเพิ่มอีกนิดหน่อย", "correct": false, "feedback": "การต่อราคาไม่ได้ช่วยลดความเสี่ยงจากการถูกโกง ควรเน้นตรวจสอบความน่าเชื่อถือของร้านค้าก่อน"}
+                        ]'
+            >
+              <i class="fas fa-shopping-cart card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">ภัยชอปปิงออนไลน์</h3>
+              <p class="text-gray-400 text-sm">
+                การหลอกลวงให้เสียทรัพย์สินจากการซื้อของ
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 300ms"
+              data-title="มัลแวร์เรียกค่าไถ่ (Ransomware)"
+              data-mp3="podcast/Ransomeware.m4a"
+              data-content="เป็นมัลแวร์ประเภทหนึ่งที่จะเข้ารหัสไฟล์ข้อมูลสำคัญในเครื่องคอมพิวเตอร์ของคุณ ทำให้ไม่สามารถเปิดใช้งานได้ จากนั้นผู้โจมตีจะเรียกเงินค่าไถ่ (มักจะเป็นสกุลเงินดิจิทัล) เพื่อแลกกับกุญแจถอดรหัส ตัวอย่างเช่น คุณคลิกลิงก์น่าสงสัยในอีเมล จากนั้นไฟล์เอกสารและรูปภาพทั้งหมดในเครื่องของคุณจะถูกล็อก และมีหน้าต่างปรากฏขึ้นมาแจ้งว่าคุณต้องจ่ายเงินภายใน 24 ชั่วโมงเพื่อเอไฟล์คืน"
+              data-scenario="ไฟล์งานสำคัญทั้งหมดของคุณถูก Ransomware เข้ารหัส และมีข้อความเรียกค่าไถ่ปรากฏขึ้นมา คุณควรทำอย่างไรเป็นอันดับแรก?"
+              data-options='[
+                            {"label": "รีบจ่ายเงินค่าไถ่ทันที เพราะกลัวเสียไฟล์ไปตลอดกาล", "correct": false, "feedback": "การจ่ายเงินไม่ได้รับประกันว่าจะได้ไฟล์คืน และยังเป็นการสนับสนุนอาชากรไซเบอร์อีกด้วย"},
+                            {"label": "ตัดการเชื่อมต่ออินเทอร์เน็ตของเครื่องทันที", "correct": true, "feedback": "ถูกต้อง! การตัดการเชื่อมต่ออินเทอร์เน็ตจะช่วยป้องกันไม่ให้มัลแวร์แพร่กระจายไปยังอุปกรณ์อื่นในเครือข่าย และเป็นขั้นตอนแรกที่สำคัญที่สุด"},
+                            {"label": "ฟอร์แมตคอมพิวเตอร์และลง Windows ใหม่", "correct": false, "feedback": "เป็นทางเลือกสุดท้าย แต่ไม่ใช่สิ่งที่ควรทำเป็นอันดับแรก เพราะจะทำให้ข้อมูลทั้งหมดหายไป ลองปรึกษาผู้เชี่ยวชาญก่อน"}
+                        ]'
+            >
+              <i class="fas fa-lock card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Ransomware</h3>
+              <p class="text-gray-400 text-sm">
+                มัลแวร์ที่เข้ารหัสไฟล์เพื่อเรียกค่าไถ่
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 400ms"
+              data-title="ภัยหลอกลวงผ่านแอปแชต"
+              data-mp3="podcast/Appchat.m4a"
+              data-content="มิจฉาชีพอาจแฮกบัญชีโซเชียลมีเดียหรือแอปแชตของเพื่อนหรือคนในครอบครัว แล้วสวมรอยทักมายืมเงิน, ขอข้อมูลส่วนตัว, หรือหลอกให้โอนเงินค่าสินค้า/บริการต่างๆ ตัวอย่างเช่น บัญชี Line ของแม่คุณทักมาบอกว่า 'ตอนนี้เดือดร้อนมาก ช่วยโอนเงินให้ 5,000 บาทก่อนได้ไหม เดี๋ยวตอนเย็นคืนให้' โดยใช้สำนวนการพิมพ์ที่ดูเร่งรีบและผิดปกติไปจากเดิม"
+              data-scenario="จู่ๆ บัญชีของเพื่อนสนิทก็ทักมายืมเงินด่วน คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "โอนให้ทันทีเพราะเป็นเพื่อนสนิทกัน", "correct": false, "feedback": "อย่าเพิ่งรีบร้อน! บัญชีของเพื่อนอาจถูกแฮกได้ การตรวจสอบก่อนเป็นสิ่งสำคัญ"},
+                            {"label": "โทรหาเพื่อนโดยตรงเพื่อยืนยันว่าเป็นเพื่อนจริงๆ", "correct": true, "feedback": "เป็นวิธีที่ดีที่สุด! การยืนยันตัวตนผ่านช่องทางอื่น เช่น การโทรศัพท์ จะช่วยให้แน่ใจได้ว่าคุณไม่ได้คุยกับมิจฉาชีพ"},
+                            {"label": "ทักถามกลับไปในแชตว่า &apos;ใช่ตัวจริงรึเปล่า&apos;", "correct": false, "feedback": "มิจฉาชีพที่สวมรอยอยู่ก็ต้องตอบว่า &apos;ใช่&apos; อยู่แล้ว วิธีนี้ไม่สามารถยืนยันตัวตนได้"}
+                        ]'
+            >
+              <i class="fas fa-comments-dollar card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">ภัยจากแอปแชต</h3>
+              <p class="text-gray-400 text-sm">
+                การสวมรอยเป็นคนรู้จักเพื่อหลอกยืมเงิน
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Security Best Practices -->
+        <section id="security-best-practices" class="mb-20">
+          <div class="text-center mb-12 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2">
+              แนวทางปฏิบัติเพื่อความปลอดภัย (Security Best Practices)
+            </h2>
+            <p class="text-gray-400">
+              เกราะป้องกันพื้นฐานที่คุณสร้างได้เองตั้งแต่วันนี้
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              data-title="รหัสผ่านที่รัดกุม & 2FA"
+              data-mp3="podcast/twofactor.m4a"
+              data-content="รหัสผ่านที่เดาง่าย (เช่น 123456, วันเกิด) คือประตูเปิดต้อนรับแฮกเกอร์ ควรตั้งรหัสผ่านให้มีความยาวอย่างน้อย 12 ตัวอักษร ผสมอักขระพิเศษ ตัวพิมพ์ใหญ่/เล็ก และไม่ซ้ำกับเว็บอื่น และที่สำคัญที่สุด ควรเปิดใช้งานการยืนยันตัวตนสองขั้นตอน (2FA) เสมอ เพื่อเพิ่มความปลอดภัยอีกชั้น"
+              data-scenario="รหัสผ่านใดต่อไปนี้ปลอดภัยที่สุด?"
+              data-options='[
+                            {"label": "P@ssw0rd1234", "correct": false, "feedback": "ถึงแม้จะมีการผสมอักขระ แต่ก็ยังเป็นคำที่เดาง่ายและพบบ่อยเกินไป"},
+                            {"label": "MyDogName1990", "correct": false, "feedback": "การใช้ข้อมูลส่วนตัว เช่น ชื่อสัตว์เลี้ยงหรือปีเกิด ทำให้เดาได้ง่ายมาก"},
+                            {"label": "B@nAnA_f!sh_R0cK$", "correct": true, "feedback": "ยอดเยี่ยม! รหัสผ่านนี้ยาว มีการผสมตัวอักษรพิมพ์ใหญ่ เล็ก สัญลักษณ์ และไม่เกี่ยวข้องกับข้อมูลส่วนตัว"}
+                        ]'
+            >
+              <i class="fas fa-key card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Strong Passwords & 2FA</h3>
+              <p class="text-gray-400 text-sm">
+                การตั้งรหัสผ่านที่รัดกุมและเปิดใช้งาน 2FA
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 100ms"
+              data-title="การสำรองข้อมูล (Data Backup)"
+              data-mp3="podcast/Backup.m4a"
+              data-content="ข้อมูลของคุณอาจสูญหายได้ตลอดเวลาจากหลายสาเหตุ เช่น อุปกรณ์ชำรุด, ถูกโจรกรรม, หรือโดน Ransomware โจมตี การสำรองข้อมูล (Backup) อย่างสม่ำเสมอจึงเป็นสิ่งสำคัญที่สุด ควรใช้หลัก 3-2-1 คือ เก็บข้อมูล 3 ชุด, ในสื่อ 2 ประเภท, และเก็บไว้นอกสถานที่ 1 ชุด (เช่น บน Cloud Storage)"
+              data-scenario="คุณเก็บไฟล์โปรเจกต์สำคัญไว้ที่ใดจึงจะปลอดภัยที่สุดหากคอมพิวเตอร์พัง?"
+              data-options='[
+                            {"label": "บน Desktop ของคอมพิวเตอร์เท่านั้น", "correct": false, "feedback": "ไม่ปลอดภัย! หากคอมพิวเตอร์พังหรือติดไวรัส ไฟล์ของคุณจะหายไปทั้งหมดทันที"},
+                            {"label": "บน Desktop และสำรองข้อมูลไว้บน Cloud (เช่น Google Drive)", "correct": true, "feedback": "ถูกต้อง! การมีสำเนาไฟล์ไว้ในที่อื่น (Cloud) จะช่วยให้คุณกู้คืนไฟล์ได้แม้ว่าคอมพิวเตอร์จะเสียหาย"},
+                            {"label": "ใน Flash Drive เพียงอันเดียว", "correct": false, "feedback": "ดีกว่าไม่มี แต่ก็ยังเสี่ยง เพราะ Flash Drive อาจสูญหายหรือชำรุดได้ง่าย"}
+                        ]'
+            >
+              <i class="fas fa-database card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Data Backup</h3>
+              <p class="text-gray-400 text-sm">
+                การป้องกันข้อมูลสูญหายจากเหตุไม่คาดฝัน
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 200ms"
+              data-title="อัปเดตซอฟต์แวร์เสมอ (Software Updates)"
+              data-mp3="podcast/Update.m4a"
+              data-content="การแจ้งเตือนอัปเดตไม่ใช่เรื่องน่ารำคาญ แต่เป็นสิ่งสำคัญอย่างยิ่ง! ในการอัปเดตแต่ละครั้ง มักจะมีการแก้ไข 'ช่องโหว่' (Vulnerabilities) ด้านความปลอดภัยที่แฮกเกอร์อาจใช้เป็นช่องทางในการโจมตีอุปกรณ์ของคุณ การไม่อัปเดตก็เหมือนกับการเปิดประตูบ้านทิ้งไว้รอโจร"
+              data-scenario="มี Pop-up แจ้งเตือน 'Software Update' ของระบบปฏิบัติการเด้งขึ้นมา คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "กด &apos;Ask Me Later&apos; ไปเรื่อยๆ เพราะขี้เกียจรอ", "correct": false, "feedback": "การผลัดวันประกันพรุ่งอาจทำให้คุณเสี่ยงต่อการถูกโจมตีผ่านช่องโหว่ที่ยังไม่ได้รับการแก้ไข"},
+                            {"label": "รีบอัปเดตทันที หรือตั้งเวลาอัปเดตในตอนกลางคืน", "correct": true, "feedback": "ดีมาก! การอัปเดตให้เป็นเวอร์ชันล่าสุดอยู่เสมอคือการปิดช่องโหว่และเสริมความปลอดภัยให้ระบบ"},
+                            {"label": "ปิดการแจ้งเตือนถาวร เพราะมันเด้งบ่อย", "correct": false, "feedback": "อันตรายที่สุด! คุณจะไม่รู้เลยว่ามีช่องโหว่ร้ายแรงเกิดขึ้น และอุปกรณ์ของคุณจะตกเป็นเป้าหมายได้ง่าย"}
+                        ]'
+            >
+              <i class="fas fa-sync-alt card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Software Updates</h3>
+              <p class="text-gray-400 text-sm">
+                การปิดช่องโหว่ความปลอดภัยด้วยการอัปเดต
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 300ms"
+              data-title="ระวังการใช้ Wi-Fi สาธารณะ"
+              data-mp3="podcast/wifi.m4a"
+              data-content="Wi-Fi ฟรีตามร้านกาแฟ, ห้างสรรพสินค้า, หรือสนามบิน อาจไม่ปลอดภัยและเสี่ยงต่อการถูกดักจับข้อมูล (Man-in-the-Middle Attack) แฮกเกอร์สามารถสร้าง Wi-Fi ปลอมที่ชื่อคล้ายกันเพื่อหลอกให้คุณเชื่อมต่อ แล้วดักดูข้อมูลสำคัญ เช่น รหัสผ่าน หรือข้อมูลบัตรเครดิต"
+              data-scenario="คุณอยู่ที่ร้านกาแฟและต้องการโอนเงินผ่านแอปธนาคาร คุณควรทำอย่างไร?"
+              data-options='[
+                            {"label": "เชื่อมต่อ Wi-Fi ฟรีของร้านแล้วโอนเงินเลย", "correct": false, "feedback": "อันตรายมาก! Wi-Fi สาธารณะอาจไม่ปลอดภัยและเสี่ยงต่อการถูกดักข้อมูลทางการเงิน"},
+                            {"label": "ใช้ 4G/5G จากมือถือของตัวเองแทนการใช้ Wi-Fi ร้าน", "correct": true, "feedback": "ถูกต้อง! การใช้เครือข่ายส่วนตัว (4G/5G) มีความปลอดภัยสูงกว่าการใช้ Wi-Fi สาธารณะ"},
+                            {"label": "ขอรหัสผ่าน Wi-Fi จากพนักงาน เพราะมีรหัสผ่านแปลว่าปลอดภัย", "correct": false, "feedback": "ไม่เสมอไป! แม้จะมีรหัสผ่าน แต่หากคนอื่นใช้เครือข่ายเดียวกันก็ยังมีความเสี่ยงอยู่ดี"}
+                        ]'
+            >
+              <i class="fas fa-wifi card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Public Wi-Fi Security</h3>
+              <p class="text-gray-400 text-sm">
+                ความเสี่ยงจากการใช้เครือข่ายไร้สายสาธารณะ
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Technical Deep Dive (From DOCX) -->
+        <section id="technical-deep-dive" class="mb-20">
+          <div class="text-center mb-12 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold mb-2">
+              ความเข้าใจเชิงลึก (Developer Deep Dive)
+            </h2>
+            <p class="text-gray-400">
+              แนวคิดทางเทคนิคสำหรับนักพัฒนา: Hashing, Encoding, และ Encryption
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              data-title="Hashing (การแฮช)"
+              data-mp3="podcast/Hashing.m4a"
+              data-content="กระบวนการแปลงข้อมูลเป็นค่าขนาดคงที่ (Hash) แบบ 'ทางเดียว' (ย้อนกลับไม่ได้) เพื่อ 'ตรวจสอบความสมบูรณ์' (Integrity) ของข้อมูล หัวใจสำคัญคือการใช้ 'Salt' (ข้อมูลสุ่ม) ร่วมกับอัลกอริทึมที่ 'ช้า' (เช่น bcrypt, Argon2) ในการเก็บรหัสผ่าน เพื่อป้องกันการโจมตีแบบ Rainbow Table"
+              data-scenario="นักพัฒนากำลังเก็บรหัสผ่านผู้ใช้ในฐานข้อมูล วิธีใดปลอดภัยที่สุด?"
+              data-options='[
+                            {"label": "ใช้ SHA-256 (เร็ว) แฮชรหัสผ่านตรงๆ", "correct": false, "feedback": "ผิด! SHA-256 &apos;เร็ว&apos; เกินไป ทำให้แฮกเกอร์เดาสุ่ม (Brute-force) ได้ง่าย ควรใช้อัลอริทึมที่ &apos;ช้า&apos; โดยเจตนา"},
+                            {"label": "ใช้ Base64 (Encoding) เพื่อซ่อนรหัสผ่าน", "correct": false, "feedback": "ผิด! Base64 เป็น Encoding &apos;ย้อนกลับได้&apos; ไม่ใช่การแฮช แฮกเกอร์สามารถ Decode กลับเป็นรหัสผ่านเดิมได้ทันที"},
+                            {"label": "ใช้ bcrypt หรือ Argon2 พร้อม &apos;Salt&apos; ที่ไม่ซ้ำกัน", "correct": true, "feedback": "ถูกต้อง! bcrypt/Argon2 &apos;ช้า&apos; โดยเจตนา และการใช้ &apos;Salt&apos; ที่ไม่ซ้ำกันสำหรับผู้ใช้แต่ละคน จะป้องกัน Rainbow Table Attacks ได้อย่างสมบูรณ์"}
+                        ]'
+            >
+              <i class="fas fa-fingerprint card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Hashing (การแฮช)</h3>
+              <p class="text-gray-400 text-sm">
+                การสร้างลายนิ้วมือดิจิทัล (Integrity)
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 100ms"
+              data-title="Encoding (การเข้ารหัสแบบแปลงข้อมูล)"
+              data-mp3="podcast/Encoding.m4a"
+              data-content="กระบวนการแปลงข้อมูล (เช่น รูปภาพ) ให้อยู่ในรูปแบบ 'ข้อความ' (เช่น Base64) เพื่อให้ส่งผ่านระบบที่รองรับเฉพาะตัวอักษรได้ 'ย้อนกลับได้ 100%' และ 'ไม่ต้องใช้กุญแจ' วัตถุประสงค์คือความเข้ากันได้ ไม่ใช่ความลับ (แต่แฮกเกอร์ใช้เพื่อ 'ปิดบัง' โค้ด)"
+              data-scenario="คุณต้องส่งรูปภาพผ่าน API ที่รับเฉพาะ JSON (ข้อความ) คุณควรใช้วิธีใด?"
+              data-options='[
+                            {"label": "ใช้ AES (Encryption) เข้ารหัสรูปภาพ", "correct": false, "feedback": "ไม่ตรงประเด็น! AES จะเปลี่ยนรูปภาพเป็นข้อมูลลับ (Ciphertext) แต่ก็ยังเป็น &apos;ข้อมูลไบนารี&apos; อยู่ดี ซึ่ง JSON อาจรับไม่ได้"},
+                            {"label": "ใช้ Base64 (Encoding) แปลงรูปภาพเป็นข้อความ", "correct": true, "feedback": "ถูกต้อง! Base64 ถูกออกแบบมาเพื่อแปลงข้อมูลไบนารี (รูปภาพ) ให้อยู่ในรูปแบบข้อความ (A-Z, a-z, 0-9) ที่ปลอดภัยสำหรับ JSON"},
+                            {"label": "ใช้ SHA-256 (Hashing) แฮชรูปภาพ", "correct": false, "feedback": "ผิด! Hashing จะให้ &apos;ลายนิ้วมือ&apos; ของรูปภาพ (ค่าแฮช) ไม่ใช่ตัวรูปภาพ และย้อนกลับไม่ได้ คุณจะเสียข้อมูลรูปภาพไปเลย"}
+                        ]'
+            >
+              <i class="fas fa-language card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">Encoding (การเข้ารหัส)</h3>
+              <p class="text-gray-400 text-sm">
+                การแปลงข้อมูลเพื่อความเข้ากันได้ (Compatibility)
+              </p>
+            </div>
+            <div
+              class="card p-6 rounded-lg text-center reveal"
+              style="transition-delay: 200ms"
+              data-title="Encryption (การเข้ารหัสลับ)"
+              data-mp3="podcast/Encryption.m4a"
+              data-content="กระบวนการแปลงข้อมูล (Plaintext) เป็นข้อมูลที่อ่านไม่ออก (Ciphertext) โดย 'ต้องใช้กุญแจ' (Key) และย้อนกลับได้เฉพาะผู้ที่มีกุญแจที่ถูกต้องเท่านั้น เพื่อรักษา 'ความลับ' (Confidentiality) โดยมีทั้งแบบ Symmetric (AES: เร็ว, กุญแจเดียว) และ Asymmetric (RSA: ช้า, กุญแจคู่)"
+              data-scenario="หลักการทำงานของ HTTPS (เว็บ https://) คืออะไร?"
+              data-options='[
+                            {"label": "ใช้ Hashing (SHA-256) เข้ารหัสข้อมูลทั้งหมด", "correct": false, "feedback": "ผิด! Hashing ย้อนกลับไม่ได้ ถ้าใช้แฮชข้อมูล เว็บไซต์ปลายทางจะไม่สามารถอ่านข้อมูลต้นฉบับได้เลย"},
+                            {"label": "ใช้ Asymmetric (RSA) เข้ารหัสข้อมูลทั้งหมด", "correct": false, "feedback": "เกือบถูก! แต่ Asymmetric &apos;ช้ามาก&apos; เกินไป ไม่เหมาะกับการเข้ารหัสข้อมูลปริมาณมาก เช่น การสตรีมมิ่ง"},
+                            {"label": "แบบผสม (Hybrid): ใช้ Asymmetric (RSA) เพื่อ &apos;ตกลง&apos; กุญแจ Symmetric (AES) แล้วใช้ AES ที่ &apos;เร็ว&apos; เข้ารหัสข้อมูลจริง", "correct": true, "feedback": "ถูกต้อง! นี่คือ Hybrid Encryption ใช้จุดแข็งของทั้งสองแบบ ความปลอดภัยของ Asymmetric และความเร็วของ Symmetric"}
+                        ]'
+            >
+              <i class="fas fa-user-lock card-icon mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">
+                Encryption (การเข้ารหัสลับ)
+              </h3>
+              <p class="text-gray-400 text-sm">
+                การปกป้องความลับของข้อมูล (Confidentiality)
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Updated Footer ===== -->
+      <footer class="py-10 border-t bg-white text-gray-800 reveal">
+        <div
+          class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-8"
+        >
+          <!-- Left: Logos -->
+          <a
+            href="https://futurex.sau.ac.th/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center space-x-2 flex-shrink-0"
+          >
+            <img
+              src="https://cdn.prod.website-files.com/6706e793555b896f25d95e70/6706ff24a3019801bbdcbb41_Screenshot%202024-10-09%20at%206.09.16%20PM.avif"
+              alt="SAU Logo"
+              class="h-8 w-auto"
+            />
+            <img
+              src="https://cdn.prod.website-files.com/6706e793555b896f25d95e70/671694390edd990dde16ea4b_FutureX.svg"
+              alt="FutureX Logo"
+              class="h-6 w-auto"
+              style="border-left: 2px solid #000; padding-left: 8px"
+            />
+          </a>
+
+          <!-- Right: Credits and Links -->
+          <div class="text-center sm:text-right">
+            <p class="mb-4 font-semibold">
+              ติดตามข้อมูลเพิ่มเติมจากหน่วยงานผู้เชี่ยวชาญ:
+            </p>
+            <div class="flex justify-center sm:justify-end space-x-6">
+              <a
+                href="https://www.thaicert.or.th/"
+                target="_blank"
+                class="text-blue-600 hover:text-blue-800 transition"
+                >ThaiCERT</a
+              >
+              <a
+                href="https://www.etda.or.th/"
+                target="_blank"
+                class="text-blue-600 hover:text-blue-800 transition"
+                >ETDA Thailand</a
+              >
+            </div>
+            <div class="text-gray-600 mt-6 text-sm">
+              <p>
+                Project from Digital Citizen subject, Southeast Asia University,
+                Thailand.
+              </p>
+              <p>Made by: Shun, Ratchata, Pataradanai 2025.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+      <!-- ===== End Updated Footer ===== -->
+    </main>
+
+    <!-- Modal Structure -->
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-cyan-400"></h2>
+
+        <!-- Audio Player Widget -->
+        <audio id="modalAudioPlayer" controls class="w-full my-4 hidden">
+          <source id="modalAudioSource" src="" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+
+        <p id="modalContent" class="text-gray-300 mb-6"></p>
+        <div id="modalInteraction">
+          <p id="modalScenario" class="font-semibold text-cyan-300 mb-4"></p>
+          <div id="modalOptions" class="flex flex-col space-y-3"></div>
+          <div id="modalFeedback" class="mt-4 p-4 rounded-lg hidden">
+            <p id="feedbackText" class="mb-4"></p>
+            <button
+              id="retryBtn"
+              class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-md transition w-full"
+            >
+              ลองอีกครั้ง
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- Particle background animation ---
+      const canvas = document.getElementById("particles-js");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particlesArray;
+
+      // Mouse interaction not used in current particle animation, but kept for potential future use
+      // const mouse = { x: null, y: null, radius: (canvas.height/80) * (canvas.width/80) };
+      // window.addEventListener('mousemove', function(event) {
+      //     mouse.x = event.x;
+      //     mouse.y = event.y;
+      // });
+
+      class Particle {
+        constructor(x, y, directionX, directionY, size) {
+          this.x = x;
+          this.y = y;
+          this.directionX = directionX;
+          this.directionY = directionY;
+          this.size = size;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+          ctx.fillStyle = "rgba(0, 242, 234, 0.5)";
+          ctx.fill();
+        }
+        update() {
+          if (this.x > canvas.width || this.x < 0) {
+            this.directionX = -this.directionX;
+          }
+          if (this.y > canvas.height || this.y < 0) {
+            this.directionY = -this.directionY;
+          }
+          this.x += this.directionX;
+          this.y += this.directionY;
+          this.draw();
+        }
+      }
+
+      function init() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.height * canvas.width) / 9000;
+        for (let i = 0; i < numberOfParticles; i++) {
+          let size = Math.random() * 2 + 1;
+          let x = Math.random() * (innerWidth - size * 2 - size * 2) + size * 2;
+          let y =
+            Math.random() * (innerHeight - size * 2 - size * 2) + size * 2;
+          let directionX = Math.random() * 0.4 - 0.2;
+          let directionY = Math.random() * 0.4 - 0.2;
+          particlesArray.push(new Particle(x, y, directionX, directionY, size));
+        }
+      }
+
+      function connect() {
+        let opacityValue = 1;
+        for (let a = 0; a < particlesArray.length; a++) {
+          for (let b = a; b < particlesArray.length; b++) {
+            let distance =
+              (particlesArray[a].x - particlesArray[b].x) *
+                (particlesArray[a].x - particlesArray[b].x) +
+              (particlesArray[a].y - particlesArray[b].y) *
+                (particlesArray[a].y - particlesArray[b].y);
+            if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+              opacityValue = 1 - distance / 20000;
+              ctx.strokeStyle = `rgba(0, 242, 234, ${opacityValue})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+              ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        for (let i = 0; i < particlesArray.length; i++) {
+          particlesArray[i].update();
+        }
+        connect();
+      }
+
+      window.addEventListener("resize", function () {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        init();
+      });
+
+      init();
+      animate();
+
+      // --- Typewriter Effect ---
+      const h1 = document.getElementById("typewriter-h1");
+      const text = "สำรวจโลกดิจิทัลอย่างปลอดภัย";
+      let index = 0;
+
+      function type() {
+        if (index < text.length) {
+          h1.innerHTML =
+            text.substring(0, index + 1) +
+            '<span class="typewriter-cursor"></span>';
+          index++;
+          setTimeout(type, 100);
+        } else {
+          h1.innerHTML =
+            text +
+            '<span class="typewriter-cursor" style="animation: none; opacity: 1;"></span>';
+        }
+      }
+      document.addEventListener("DOMContentLoaded", type);
+
+      // --- Enhanced Modal Logic ---
+      const modal = document.getElementById("infoModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalContent = document.getElementById("modalContent");
+      const modalScenario = document.getElementById("modalScenario");
+      const modalOptions = document.getElementById("modalOptions");
+      const modalFeedback = document.getElementById("modalFeedback");
+      const feedbackText = document.getElementById("feedbackText");
+      const retryBtn = document.getElementById("retryBtn");
+      const closeModalBtn = document.querySelector(".close-btn");
+      const cards = document.querySelectorAll(".card");
+
+      // Audio Player elements
+      const modalAudioPlayer = document.getElementById("modalAudioPlayer");
+      const modalAudioSource = document.getElementById("modalAudioSource");
+
+      cards.forEach((card) => {
+        card.addEventListener("click", () => {
+          // Return if card is not interactive
+          if (!card.dataset.options) return;
+
+          // 1. Get data from attributes
+          const title = card.dataset.title;
+          const content = card.dataset.content;
+          const scenario = card.dataset.scenario;
+          const mp3Src = card.dataset.mp3; // Get MP3 path
+          let options;
+
+          try {
+            // Use DOMPurify or similar if content is user-generated
+            // For this project, we trust the hardcoded data
+            options = JSON.parse(card.dataset.options);
+          } catch (error) {
+            console.error("Error parsing JSON data for card:", title, error);
+            console.error("Malformed JSON:", card.dataset.options);
+            return; // Stop if JSON is invalid
+          }
+
+          // 2. Populate modal
+          modalTitle.textContent = title;
+          modalContent.textContent = content;
+          modalScenario.textContent = scenario;
+
+          // 3. Handle Audio Player
+          if (mp3Src) {
+            modalAudioSource.setAttribute("src", mp3Src);
+            modalAudioPlayer.load(); // Load the new audio source
+            modalAudioPlayer.style.display = "block"; // Show the player
+          } else {
+            modalAudioPlayer.style.display = "none"; // Hide player if no mp3
+            modalAudioSource.setAttribute("src", ""); // Clear source
+          }
+
+          // 4. Clear previous options and feedback
+          modalOptions.innerHTML = "";
+          modalFeedback.style.display = "none";
+          feedbackText.textContent = "";
+          modalFeedback.classList.remove(
+            "feedback-correct",
+            "feedback-incorrect"
+          );
+          modalOptions.style.display = "flex";
+          retryBtn.style.display = "block"; // Reset button visibility
+
+          // 5. Create and append option buttons
+          options.forEach((option) => {
+            const button = document.createElement("button");
+            button.textContent = option.label;
+            button.classList.add("option-btn");
+            button.onclick = () => {
+              feedbackText.textContent = option.feedback;
+              if (option.correct) {
+                modalFeedback.classList.add("feedback-correct");
+                retryBtn.style.display = "none"; // Hide button on correct answer
+              } else {
+                modalFeedback.classList.add("feedback-incorrect");
+                retryBtn.style.display = "block"; // Show button on incorrect answer
+              }
+              modalFeedback.style.display = "block";
+              modalOptions.style.display = "none";
+            };
+            modalOptions.appendChild(button);
+          });
+
+          // 6. Display modal
+          modal.style.display = "block";
+        });
+      });
+
+      retryBtn.addEventListener("click", () => {
+        modalFeedback.style.display = "none";
+        modalOptions.style.display = "flex";
+        modalFeedback.classList.remove(
+          "feedback-correct",
+          "feedback-incorrect"
+        );
+      });
+
+      function closeModal() {
+        modal.style.display = "none";
+
+        // Stop and reset audio player
+        modalAudioPlayer.pause();
+        modalAudioSource.setAttribute("src", "");
+        modalAudioPlayer.style.display = "none";
+
+        // Also reset state on close
+        modalFeedback.style.display = "none";
+        modalOptions.style.display = "flex";
+        modalFeedback.classList.remove(
+          "feedback-correct",
+          "feedback-incorrect"
+        );
+        retryBtn.style.display = "block"; // Reset button visibility
+      }
+
+      closeModalBtn.addEventListener("click", closeModal);
+
+      window.addEventListener("click", (event) => {
+        if (event.target == modal) {
+          closeModal();
+        }
+      });
+
+      // --- Scroll Down Arrow Fade ---
+      const scrollArrow = document.getElementById("scroll-down-arrow");
+      window.addEventListener("scroll", () => {
+        // Fade out arrow if scrolled more than 50px
+        if (window.scrollY > 50) {
+          scrollArrow.style.opacity = "0";
+        } else {
+          scrollArrow.style.opacity = "1";
+        }
+      });
+
+      // --- Scroll Animation ---
+      const revealElements = document.querySelectorAll(".reveal");
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+        }
+      );
+
+      revealElements.forEach((el) => {
+        revealObserver.observe(el);
+      });
+    </script>
+  </body>
+</html>
