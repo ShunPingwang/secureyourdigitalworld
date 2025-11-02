@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>โปรแกรมจำลองการ Hashing รหัสผ่าน</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* CSS Variables for mouse position */
+      html {
+        --mouse-x: 50%;
+        --mouse-y: 50%;
+      }
+
+      /* Custom font */
+      body {
+        font-family: "Anuphan", sans-serif;
+        background-color: #0b0c10; /* Dark blue from the image */
+
+        /* New Cursor Spotlight Effect */
+        background-image: radial-gradient(
+          600px circle at var(--mouse-x) var(--mouse-y),
+          rgba(102, 252, 241, 0.1),
+          /* Bright blue-green color from theme, 10% opacity */ transparent 60%
+            /* Fade out to transparent */
+        );
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* Gradient stays fixed to viewport */
+
+        color: #c5c6c7; /* Light gray text */
+        overflow: hidden; /* Prevent scrollbars */
+        position: relative;
+      }
+
+      /* Style for the textareas */
+      textarea {
+        font-family: "Courier New", Courier, monospace;
+        word-break: break-all;
+      }
+      /* Override Tailwind's default dark mode colors for specific elements to match the design */
+      .bg-gray-800 {
+        background-color: #1a1a2e; /* Darker blue-purple for cards */
+      }
+      .border-gray-700 {
+        border-color: #2c2c4b; /* Slightly lighter border for cards */
+      }
+      .bg-gray-700 {
+        background-color: #27273f; /* Input fields background */
+      }
+      .border-gray-600 {
+        border-color: #3f3f5a; /* Input fields border */
+      }
+      .text-cyan-400 {
+        color: #66fcf1; /* Primary highlight color */
+      }
+      .text-green-400 {
+        color: #66fcf1; /* Match primary highlight for consistent branding */
+      }
+      .text-yellow-400 {
+        color: #ffde59; /* A softer yellow for contrast */
+      }
+      .bg-cyan-600 {
+        background-color: #45a29e; /* Button background */
+      }
+      .hover\:bg-cyan-700:hover {
+        background-color: #388a85; /* Button hover */
+      }
+      .focus\:ring-cyan-500:focus {
+        --tw-ring-color: #66fcf1; /* Focus ring color */
+      }
+      .focus\:ring-yellow-500:focus {
+        --tw-ring-color: #ffde59; /* Focus ring color */
+      }
+      .bg-gray-900 {
+        background-color: #0d0d15; /* Deeper background for textareas */
+      }
+      .text-gray-400 {
+        color: #a0a0b0; /* Subtler text */
+      }
+      .text-gray-300 {
+        color: #e0e0e0; /* Label text */
+      }
+      .border-green-600 {
+        border-color: #45a29e; /* Success border */
+      }
+      .border-red-600 {
+        border-color: #ff6b6b; /* Failure border */
+      }
+      .text-green-500 {
+        color: #45a29e; /* Success icon */
+      }
+      .text-red-500 {
+        color: #ff6b6b; /* Failure icon */
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-4xl mx-auto relative z-10">
+      <h1 class="text-3xl font-bold text-center text-cyan-400 mb-6">
+        โปรแกรมจำลองการ Hashing & ยืนยันรหัสผ่าน
+      </h1>
+      <p class="text-center text-gray-400 mb-8 max-w-2xl mx-auto">
+        เครื่องมือนี้จำลองวิธีที่ระบบสมัยใหม่ใช้จัดเก็บและยืนยันรหัสผ่านอย่างปลอดภัย
+        สังเกตว่าเราจะไม่เก็บรหัสผ่านจริง ๆ แต่จะเก็บเฉพาะค่า "Hash" เท่านั้น
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- 1. กล่องลงทะเบียน -->
+        <div
+          class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700"
+        >
+          <h2
+            class="text-2xl font-semibold mb-5 text-green-400 border-b border-gray-700 pb-2"
+          >
+            1. กระบวนการ "ลงทะเบียน" (การ Hashing)
+          </h2>
+
+          <!-- ช่องป้อนรหัสผ่าน -->
+          <div class="mb-4">
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >ป้อนรหัสผ่าน:</label
+            >
+            <input
+              type="password"
+              id="password"
+              value="MyP@ssword123"
+              class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- ช่อง Salt และปุ่ม -->
+          <div class="mb-4">
+            <label
+              for="salt"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >Salt ที่สร้างขึ้น:</label
+            >
+
+            <div class="flex gap-2 flex-nowrap">
+              <input
+                type="text"
+                id="salt"
+                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-400 focus:ring-2 focus:ring-cyan-500 focus:outline-none min-w-0"
+                readonly
+              />
+              <button
+                id="generate-salt"
+                class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md font-medium text-sm whitespace-nowrap flex-shrink-0"
+              >
+                สร้าง Salt ใหม่
+              </button>
+            </div>
+          </div>
+
+          <!-- ช่องเลือกอัลกอริทึม -->
+          <div class="mb-4">
+            <label
+              for="algorithm"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >อัลกอริทึมการ Hashing:</label
+            >
+            <select
+              id="algorithm"
+              class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+            >
+              <option value="SHA-256">SHA-256 (ปลอดภัย)</option>
+              <option value="SHA-384">SHA-384 (ปลอดภัยกว่า)</option>
+              <option value="SHA-512">SHA-512 (ปลอดภัยมาก)</option>
+            </select>
+          </div>
+
+          <!-- ช่องแสดง Hash ที่จัดเก็บ -->
+          <div>
+            <label
+              for="stored-hash"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >Hash ที่จัดเก็บ (สิ่งที่บันทึกในฐานข้อมูล):</label
+            >
+            <textarea
+              id="stored-hash"
+              rows="5"
+              class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-green-400 text-sm"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- 2. กล่องเข้าสู่ระบบ -->
+        <div
+          class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700"
+        >
+          <h2
+            class="text-2xl font-semibold mb-5 text-yellow-400 border-b border-gray-700 pb-2"
+          >
+            2. กระบวนการ "เข้าสู่ระบบ" (การยืนยัน)
+          </h2>
+
+          <!-- ช่องป้อนรหัสผ่านเพื่อยืนยัน -->
+          <div class="mb-4">
+            <label
+              for="verify-password"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >ป้อนรหัสผ่านเพื่อยืนยัน:</label
+            >
+            <input
+              type="password"
+              id="verify-password"
+              value="MyP@ssword123"
+              class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+            />
+          </div>
+
+          <p class="text-sm text-gray-400 mb-4">
+            (ระบบจะดึง *Salt ตัวเดียวกัน* จากฐานข้อมูลมาใช้ในการตรวจสอบ)
+          </p>
+
+          <!-- ช่องแสดง Hash ที่คำนวณได้ -->
+          <div class="mb-4">
+            <label
+              for="computed-hash"
+              class="block text-sm font-medium text-gray-300 mb-1"
+              >Hash ที่คำนวณได้ (เพื่อเทียบกับ Hash ที่จัดเก็บ):</label
+            >
+            <textarea
+              id="computed-hash"
+              rows="5"
+              class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-yellow-400 text-sm"
+              readonly
+            ></textarea>
+          </div>
+
+          <!-- กล่องแสดงสถานะ -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1"
+              >สถานะการยืนยัน:</label
+            >
+            <div
+              id="status"
+              class="flex items-center p-4 rounded-md bg-gray-900 border border-gray-600"
+            >
+              <!-- สถานะจะถูกเติมโดย JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener("mousemove", (e) => {
+        document.documentElement.style.setProperty(
+          "--mouse-x",
+          `${e.clientX}px`
+        );
+        document.documentElement.style.setProperty(
+          "--mouse-y",
+          `${e.clientY}px`
+        );
+      });
+
+      // องค์ประกอบ DOM
+      const passwordInput = document.getElementById("password");
+      const saltInput = document.getElementById("salt");
+      const algorithmSelect = document.getElementById("algorithm");
+      const storedHashOutput = document.getElementById("stored-hash");
+      const verifyPasswordInput = document.getElementById("verify-password");
+      const computedHashOutput = document.getElementById("computed-hash");
+      const generateSaltBtn = document.getElementById("generate-salt");
+      const statusDiv = document.getElementById("status");
+
+      // ไอคอน SVG สำหรับสถานะ
+      const successIcon = `
+            <svg class="w-8 h-8 text-green-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-lg font-medium text-green-400">ตรงกัน! อนุมัติการเข้าถึง</span>`;
+
+      const failureIcon = `
+            <svg class="w-8 h-8 text-red-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-lg font-medium text-red-400">ไม่ตรงกัน! ปฏิเสธการเข้าถึง</span>`;
+
+      /**
+       * Generates a random salt.
+       * ในแอปจริง นี่จะทำครั้งเดียวต่อผู้ใช้ตอนลงทะเบียน
+       */
+      function generateSalt() {
+        const array = new Uint32Array(8);
+        window.crypto.getRandomValues(array);
+        saltInput.value = Array.from(array, (dec) =>
+          ("0" + dec.toString(16)).substr(-2)
+        ).join("");
+      }
+
+      /**
+       * ทำการ Hash สตริงรหัสผ่านด้วย Salt และอัลกอริทึมโดยใช้ SubtleCrypto API
+       * คืนค่า Hash เป็น hex string
+       */
+      async function hashPassword(password, salt, algorithm) {
+        try {
+          const text = password + salt; // รวมรหัสผ่านกับ Salt
+          const data = new TextEncoder().encode(text); // เข้ารหัสเป็น UTF-8
+          const hashBuffer = await window.crypto.subtle.digest(algorithm, data); // ทำการ Hash
+
+          // แปลง ArrayBuffer เป็นสตริง Hex
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hexHash = hashArray
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          return hexHash;
+        } catch (error) {
+          console.error("Hashing error:", error);
+          return "Error hashing...";
+        }
+      }
+
+      /**
+       * ฟังก์ชันหลักเพื่ออัปเดต Hash ทั้งหมดและตรวจสอบสถานะ
+       */
+      async function updateHashes() {
+        const password = passwordInput.value;
+        const salt = saltInput.value;
+        const algorithm = algorithmSelect.value;
+        const verifyPassword = verifyPasswordInput.value;
+
+        // 1. อัปเดต "Hash ที่จัดเก็บ" (ลงทะเบียน)
+        const storedHash = await hashPassword(password, salt, algorithm);
+        storedHashOutput.value = storedHash;
+
+        // 2. อัปเดต "Hash ที่คำนวณได้" (เข้าสู่ระบบ)
+        const computedHash = await hashPassword(
+          verifyPassword,
+          salt,
+          algorithm
+        );
+        computedHashOutput.value = computedHash;
+
+        // 3. เปรียบเทียบ Hash และอัปเดตสถานะ
+        if (
+          storedHash === computedHash &&
+          storedHash !== "" &&
+          storedHash.indexOf("Error") === -1
+        ) {
+          statusDiv.innerHTML = successIcon;
+          statusDiv.classList.remove("border-red-600");
+          statusDiv.classList.add("border-green-600");
+        } else {
+          statusDiv.innerHTML = failureIcon;
+          statusDiv.classList.remove("border-green-600");
+          statusDiv.classList.add("border-red-600");
+        }
+      }
+
+      // --- ตัวดักฟังเหตุการณ์ ---
+      passwordInput.addEventListener("input", updateHashes);
+      saltInput.addEventListener("input", updateHashes);
+      verifyPasswordInput.addEventListener("input", updateHashes);
+      algorithmSelect.addEventListener("change", updateHashes);
+
+      generateSaltBtn.addEventListener("click", () => {
+        generateSalt();
+        updateHashes();
+      });
+
+      // --- โหลดเริ่มต้น ---
+      generateSalt();
+      updateHashes();
+    </script>
+  </body>
+</html>
