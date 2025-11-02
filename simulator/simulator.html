@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>โปรแกรมจำลองความปลอดภัยข้อมูล</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* CSS Variables for mouse position */
+      html {
+        --mouse-x: 50%;
+        --mouse-y: 50%;
+      }
+
+      /* * 1. CSS หลักสำหรับหน้า Hub 
+         */
+      body {
+        font-family: "Anuphan", sans-serif;
+        background-color: #0b0c10; /* Dark blue from the image */
+
+        /* Cursor Spotlight Effect */
+        background-image: radial-gradient(
+          600px circle at var(--mouse-x) var(--mouse-y),
+          rgba(102, 252, 241, 0.1),
+          /* Bright blue-green color from theme, 10% opacity */ transparent 60%
+            /* Fade out to transparent */
+        );
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* Gradient stays fixed to viewport */
+
+        color: #c5c6c7; /* Light gray text */
+        position: relative;
+      }
+
+      /* * 2. CSS สำหรับปุ่มเลือก Simulator
+         * (ใช้สไตล์ "card" จากต้นแบบ)
+         */
+      .simulator-card {
+        background-color: #1a1a2e;
+        border: 1px solid #2c2c4b;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .simulator-card:hover {
+        transform: translateY(-5px);
+        border-color: #66fcf1;
+        box-shadow: 0 10px 15px -3px rgba(102, 252, 241, 0.1),
+          0 4px 6px -2px rgba(102, 252, 241, 0.05);
+      }
+
+      /* * 3. CSS สำหรับ Modal (Pop-up)
+         */
+      #modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(11, 12, 16, 0.9); /* Dark bg with opacity */
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      #modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #modal-content {
+        background-color: #0b0c10; /* Match body bg */
+        border: 1px solid #2c2c4b;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        width: 100%;
+        max-width: 60rem; /* กว้างกว่าเดิมเล็กน้อยสำหรับ Simulator */
+        max-height: 90vh; /* จำกัดความสูง */
+        overflow-y: auto; /* ให้เลื่อนได้ถ้าเนื้อหาล้น */
+        position: relative;
+        z-index: 51;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+      }
+      #modal-overlay.visible #modal-content {
+        transform: scale(1);
+      }
+
+      #modal-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: #a0a0b0;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+      #modal-close-btn:hover {
+        color: #66fcf1;
+      }
+
+      /* * 4. CSS สำหรับ Simulator (ใช้ซ้ำจากต้นแบบ)
+         * (จำเป็นต้องมีในนี้เพื่อให้ Modal แสดงผลถูกต้อง)
+         */
+      textarea {
+        font-family: "Courier New", Courier, monospace;
+        word-break: break-all;
+        min-height: 120px;
+      }
+      .bg-gray-800 {
+        background-color: #1a1a2e;
+      }
+      .border-gray-700 {
+        border-color: #2c2c4b;
+      }
+      .bg-gray-700 {
+        background-color: #27273f;
+      }
+      .border-gray-600 {
+        border-color: #3f3f5a;
+      }
+      .text-cyan-400 {
+        color: #66fcf1;
+      }
+      .text-green-400 {
+        color: #66fcf1;
+      }
+      .text-yellow-400 {
+        color: #ffde59;
+      }
+      .bg-cyan-600 {
+        background-color: #45a29e;
+      }
+      .hover\:bg-cyan-700:hover {
+        background-color: #388a85;
+      }
+      .focus\:ring-cyan-500:focus {
+        --tw-ring-color: #66fcf1;
+      }
+      .focus\:ring-yellow-500:focus {
+        --tw-ring-color: #ffde59;
+      }
+      .bg-gray-900 {
+        background-color: #0d0d15;
+      }
+      .text-gray-400 {
+        color: #a0a0b0;
+      }
+      .text-gray-300 {
+        color: #e0e0e0;
+      }
+      .border-red-600 {
+        border-color: #ff6b6b;
+      }
+      .text-red-500 {
+        color: #ff6b6b;
+      }
+      .border-green-600 {
+        border-color: #45a29e;
+      }
+      .text-green-500 {
+        color: #45a29e;
+      }
+    </style>
+  </head>
+  <body class="p-4 py-8">
+    <!-- 1. หน้า Hub หลัก -->
+    <div class="w-full max-w-4xl mx-auto relative z-10">
+      <h1 class="text-3xl lg:text-4xl font-bold text-center text-cyan-400 mb-6">
+        โปรแกรมจำลองความปลอดภัยข้อมูล
+      </h1>
+      <p class="text-center text-gray-400 mb-10 max-w-2xl mx-auto">
+        เลือกหนึ่งในสามแนวคิดพื้นฐานด้านความปลอดภัยของข้อมูลเพื่อเปิดโปรแกรมจำลองและทดสอบการทำงาน
+      </p>
+
+      <!-- 2. ตารางปุ่มเลือก Simulator -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Hashing Card -->
+        <div id="open-hash-btn" class="simulator-card">
+          <h2 class="text-2xl font-semibold mb-3 text-green-400">Hashing</h2>
+          <p class="text-gray-400 text-sm">
+            กระบวนการ "บด" ข้อมูล (เช่น รหัสผ่าน) ให้เป็นค่าใหม่ที่
+            **ย้อนกลับไม่ได้** (One-way) เพื่อการจัดเก็บที่ปลอดภัย
+          </p>
+        </div>
+
+        <!-- Encoding Card -->
+        <div id="open-encode-btn" class="simulator-card">
+          <h2 class="text-2xl font-semibold mb-3 text-cyan-400">Encoding</h2>
+          <p class="text-gray-400 text-sm">
+            กระบวนการ "แปล" ข้อมูลไปเป็นอีกรูปแบบ (เช่น Base64) ที่
+            **ย้อนกลับได้** (Two-way) เพื่อความเข้ากันได้ของระบบ
+          </p>
+        </div>
+
+        <!-- Encryption Card -->
+        <div id="open-encrypt-btn" class="simulator-card">
+          <h2 class="text-2xl font-semibold mb-3 text-yellow-400">
+            Encryption
+          </h2>
+          <p class="text-gray-400 text-sm">
+            กระบวนการ "ล็อค" ข้อมูลด้วยกุญแจ (Key) ที่
+            **ย้อนกลับได้เฉพาะเมื่อมีกุญแจ** (Two-way with Key) เพื่อความลับ
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. โครงสร้าง Modal (Pop-up) -->
+    <div id="modal-overlay" class="hidden">
+      <div id="modal-content">
+        <button id="modal-close-btn" title="ปิด">&times;</button>
+        <div id="modal-body">
+          <!-- เนื้อหา Simulator จะถูกฉีดเข้าที่นี่ -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- 1. Global Mouse-follow effect ---
+      window.addEventListener("mousemove", (e) => {
+        document.documentElement.style.setProperty(
+          "--mouse-x",
+          `${e.clientX}px`
+        );
+        document.documentElement.style.setProperty(
+          "--mouse-y",
+          `${e.clientY}px`
+        );
+      });
+
+      // --- 2. HTML Templates สำหรับแต่ละ Simulator ---
+      // (เราเก็บ HTML ไว้ในตัวแปร เพื่อรอฉีดเข้า Modal)
+
+      const hashingHTML = `
+            <h1 class="text-3xl font-bold text-center text-cyan-400 mb-6">โปรแกรมจำลองการ Hashing & ยืนยันรหัสผ่าน</h1>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 1. กล่องลงทะเบียน -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-green-400 border-b border-gray-700 pb-2">1. กระบวนการ "ลงทะเบียน"</h2>
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-1">ป้อนรหัสผ่าน:</label>
+                        <input type="password" id="password" value="MyP@ssword123" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                    </div>
+                    <div class="mb-4">
+                        <label for="salt" class="block text-sm font-medium text-gray-300 mb-1">Salt ที่สร้างขึ้น:</label>
+                        <div class="flex gap-2 flex-nowrap">
+                            <input type="text" id="salt" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-400 focus:ring-2 focus:ring-cyan-500 focus:outline-none min-w-0" readonly>
+                            <button id="generate-salt" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md font-medium text-sm whitespace-nowrap flex-shrink-0">สร้าง Salt ใหม่</button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="algorithm" class="block text-sm font-medium text-gray-300 mb-1">อัลกอริทึมการ Hashing:</label>
+                        <select id="algorithm" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                            <option value="SHA-256">SHA-256</option>
+                            <option value="SHA-384">SHA-384</option>
+                            <option value="SHA-512">SHA-512</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="stored-hash" class="block text-sm font-medium text-gray-300 mb-1">Hash ที่จัดเก็บ:</label>
+                        <textarea id="stored-hash" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-green-400 text-sm" readonly></textarea>
+                    </div>
+                </div>
+                <!-- 2. กล่องเข้าสู่ระบบ -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-yellow-400 border-b border-gray-700 pb-2">2. กระบวนการ "เข้าสู่ระบบ"</h2>
+                    <div class="mb-4">
+                        <label for="verify-password" class="block text-sm font-medium text-gray-300 mb-1">ป้อนรหัสผ่านเพื่อยืนยัน:</label>
+                        <input type="password" id="verify-password" value="MyP@ssword123" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">(ระบบจะดึง *Salt ตัวเดียวกัน* มาใช้)</p>
+                    <div class="mb-4">
+                        <label for="computed-hash" class="block text-sm font-medium text-gray-300 mb-1">Hash ที่คำนวณได้ (เพื่อเทียบ):</label>
+                        <textarea id="computed-hash" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-yellow-400 text-sm" readonly></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">สถานะการยืนยัน:</label>
+                        <div id="status" class="flex items-center p-4 rounded-md bg-gray-900 border border-gray-600"></div>
+                    </div>
+                </div>
+            </div>`;
+
+      const encodingHTML = `
+            <h1 class="text-3xl font-bold text-center text-cyan-400 mb-6">โปรแกรมจำลองการ Encoding / Decoding (Base64)</h1>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 1. กล่อง ENCODE -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-green-400 border-b border-gray-700 pb-2">1. กระบวนการ Encode</h2>
+                    <div class="mb-4">
+                        <label for="plain-text" class="block text-sm font-medium text-gray-300 mb-1">ข้อความปกติ (Plain Text):</label>
+                        <textarea id="plain-text" rows="5" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none">สวัสดี ประเทศไทย!</textarea>
+                    </div>
+                    <button id="encode-btn" class="w-full py-3 px-4 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md font-semibold text-lg mb-4">Encode &downarrow;</button>
+                    <div>
+                        <label for="base64-output" class="block text-sm font-medium text-gray-300 mb-1">ข้อความ Base64:</label>
+                        <textarea id="base64-output" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-green-400 text-sm" readonly></textarea>
+                    </div>
+                </div>
+                <!-- 2. กล่อง DECODE -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-yellow-400 border-b border-gray-700 pb-2">2. กระบวนการ Decode</h2>
+                    <div class="mb-4">
+                        <label for="base64-input" class="block text-sm font-medium text-gray-300 mb-1">ข้อความ Base64:</label>
+                        <textarea id="base64-input" rows="5" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none"></textarea>
+                    </div>
+                    <button id="decode-btn" class="w-full py-3 px-4 bg-gray-600 hover:bg-gray-500 text-white rounded-md font-semibold text-lg mb-4">&uparrow; Decode</button>
+                    <div>
+                        <label for="plain-output" class="block text-sm font-medium text-gray-300 mb-1">ข้อความปกติ (Plain Text):</label>
+                        <textarea id="plain-output" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-yellow-400 text-sm" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+            <div id="error-box" class="hidden flex items-center p-4 mt-6 rounded-md bg-red-900 bg-opacity-50 border border-red-600">
+                <svg class="w-6 h-6 text-red-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                <span id="error-message" class="text-red-400"></span>
+            </div>`;
+
+      const encryptionHTML = `
+            <h1 class="text-3xl font-bold text-center text-cyan-400 mb-6">โปรแกรมจำลองการ Encryption / Decryption (AES-GCM)</h1>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 1. กล่อง ENCRYPT -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-green-400 border-b border-gray-700 pb-2">1. กระบวนการ Encrypt</h2>
+                    <div class="mb-4">
+                        <label for="plain-text-input" class="block text-sm font-medium text-gray-300 mb-1">ข้อความปกติ:</label>
+                        <textarea id="plain-text-input" rows="4" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none">นี่คือข้อมูลลับสุดยอด</textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password-encrypt" class="block text-sm font-medium text-gray-300 mb-1">รหัสผ่าน (Key):</label>
+                        <input type="password" id="password-encrypt" value="MySecretKey123" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                    </div>
+                    <button id="encrypt-btn" class="w-full py-3 px-4 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md font-semibold text-lg mb-4 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" /></svg>
+                        Encrypt &downarrow;
+                    </button>
+                    <div>
+                        <label for="encrypted-output" class="block text-sm font-medium text-gray-300 mb-1">ข้อมูลที่เข้ารหัสลับ (Base64):</label>
+                        <textarea id="encrypted-output" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-green-400 text-sm" readonly></textarea>
+                    </div>
+                </div>
+                <!-- 2. กล่อง DECRYPT -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700">
+                    <h2 class="text-2xl font-semibold mb-5 text-yellow-400 border-b border-gray-700 pb-2">2. กระบวนการ Decrypt</h2>
+                    <div class="mb-4">
+                        <label for="encrypted-input" class="block text-sm font-medium text-gray-300 mb-1">ข้อมูลที่เข้ารหัสลับ (Base64):</label>
+                        <textarea id="encrypted-input" rows="4" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password-decrypt" class="block text-sm font-medium text-gray-300 mb-1">รหัสผ่าน (Key):</label>
+                        <input type="password" id="password-decrypt" value="MySecretKey123" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                    </div>
+                    <button id="decrypt-btn" class="w-full py-3 px-4 bg-gray-600 hover:bg-gray-500 text-white rounded-md font-semibold text-lg mb-4 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M14.5 1A4.5 4.5 0 0 0 10 5.5V9H9a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2V5.5A3 3 0 1 1 13 8.5V9h-2v2.03a.75.75 0 0 0 1.5 0V11h1a.5.5 0 0 1 .5.5v1.293l.97-.97a.75.75 0 1 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06l-.97-.97V11.5a2 2 0 0 0-2-2h-1V5.5a4.5 4.5 0 0 0 4.5-4.5Z" clip-rule="evenodd" /></svg>
+                        &uparrow; Decrypt
+                    </button>
+                    <div>
+                        <label for="plain-text-output" class="block text-sm font-medium text-gray-300 mb-1">ข้อความปกติ:</label>
+                        <textarea id="plain-text-output" rows="5" class="w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-yellow-400 text-sm" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+            <div id="error-box" class="hidden flex items-center p-4 mt-6 rounded-md bg-red-900 bg-opacity-50 border border-red-600">
+                <svg class="w-6 h-6 text-red-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                <span id="error-message" class="text-red-400"></span>
+            </div>`;
+
+      // --- 3. Logic สำหรับการเปิด/ปิด Modal ---
+
+      const modalOverlay = document.getElementById("modal-overlay");
+      const modalBody = document.getElementById("modal-body");
+      const modalCloseBtn = document.getElementById("modal-close-btn");
+
+      const openHashBtn = document.getElementById("open-hash-btn");
+      const openEncodeBtn = document.getElementById("open-encode-btn");
+      const openEncryptBtn = document.getElementById("open-encrypt-btn");
+
+      // ฟังก์ชันสำหรับเปิด Modal และฉีดเนื้อหา + รันสคริปต์
+      function openModal(type) {
+        if (type === "hash") {
+          modalBody.innerHTML = hashingHTML;
+          initHashingSimulator(); // รันสคริปต์ของ Hashing
+        } else if (type === "encode") {
+          modalBody.innerHTML = encodingHTML;
+          initEncodingSimulator(); // รันสคริปต์ของ Encoding
+        } else if (type === "encrypt") {
+          modalBody.innerHTML = encryptionHTML;
+          initEncryptionSimulator(); // รันสคริปต์ของ Encryption
+        }
+        modalOverlay.classList.add("visible");
+      }
+
+      // ฟังก์ชันสำหรับปิด Modal และล้างเนื้อหา
+      function closeModal() {
+        modalOverlay.classList.remove("visible");
+        // ล้างเนื้อหาเพื่อหยุดสคริปต์และลบ event listeners ที่ผูกกับ element ภายใน
+        modalBody.innerHTML = "";
+      }
+
+      // ตั้งค่า Event Listeners
+      openHashBtn.addEventListener("click", () => openModal("hash"));
+      openEncodeBtn.addEventListener("click", () => openModal("encode"));
+      openEncryptBtn.addEventListener("click", () => openModal("encrypt"));
+
+      modalCloseBtn.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (e) => {
+        // ปิดเฉพาะเมื่อคลิกที่พื้นหลังสีดำ ไม่ใช่ตัว content
+        if (e.target === modalOverlay) {
+          closeModal();
+        }
+      });
+
+      // --- 4. JavaScript สำหรับแต่ละ Simulator ---
+      // (เราต้องสร้างฟังก์ชัน init... เพื่อให้สคริปต์ทำงาน *หลังจาก* ที่ HTML ถูกฉีดเข้าไปใน Modal แล้ว)
+
+      /* * =================================
+       * LOGIC สำหรับ HASHING SIMULATOR
+       * =================================
+       */
+      function initHashingSimulator() {
+        const passwordInput = document.getElementById("password");
+        const saltInput = document.getElementById("salt");
+        const algorithmSelect = document.getElementById("algorithm");
+        const storedHashOutput = document.getElementById("stored-hash");
+        const verifyPasswordInput = document.getElementById("verify-password");
+        const computedHashOutput = document.getElementById("computed-hash");
+        const generateSaltBtn = document.getElementById("generate-salt");
+        const statusDiv = document.getElementById("status");
+
+        const successIcon = `
+                <svg class="w-8 h-8 text-green-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="text-lg font-medium text-green-400">ตรงกัน! อนุมัติการเข้าถึง</span>`;
+        const failureIcon = `
+                <svg class="w-8 h-8 text-red-500 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="text-lg font-medium text-red-400">ไม่ตรงกัน! ปฏิเสธการเข้าถึง</span>`;
+
+        function generateSalt() {
+          const array = new Uint32Array(8);
+          window.crypto.getRandomValues(array);
+          saltInput.value = Array.from(array, (dec) =>
+            ("0" + dec.toString(16)).substr(-2)
+          ).join("");
+        }
+
+        async function hashPassword(password, salt, algorithm) {
+          try {
+            const text = password + salt;
+            const data = new TextEncoder().encode(text);
+            const hashBuffer = await window.crypto.subtle.digest(
+              algorithm,
+              data
+            );
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hexHash = hashArray
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+            return hexHash;
+          } catch (error) {
+            return "Error hashing...";
+          }
+        }
+
+        async function updateHashes() {
+          const password = passwordInput.value;
+          const salt = saltInput.value;
+          const algorithm = algorithmSelect.value;
+          const verifyPassword = verifyPasswordInput.value;
+          const storedHash = await hashPassword(password, salt, algorithm);
+          storedHashOutput.value = storedHash;
+          const computedHash = await hashPassword(
+            verifyPassword,
+            salt,
+            algorithm
+          );
+          computedHashOutput.value = computedHash;
+          if (
+            storedHash === computedHash &&
+            storedHash !== "" &&
+            storedHash.indexOf("Error") === -1
+          ) {
+            statusDiv.innerHTML = successIcon;
+            statusDiv.classList.remove("border-red-600");
+            statusDiv.classList.add("border-green-600");
+          } else {
+            statusDiv.innerHTML = failureIcon;
+            statusDiv.classList.remove("border-green-600");
+            statusDiv.classList.add("border-red-600");
+          }
+        }
+
+        passwordInput.addEventListener("input", updateHashes);
+        saltInput.addEventListener("input", updateHashes);
+        verifyPasswordInput.addEventListener("input", updateHashes);
+        algorithmSelect.addEventListener("change", updateHashes);
+        generateSaltBtn.addEventListener("click", () => {
+          generateSalt();
+          updateHashes();
+        });
+
+        generateSalt();
+        updateHashes();
+      }
+
+      /* * =================================
+       * LOGIC สำหรับ ENCODING SIMULATOR
+       * =================================
+       */
+      function initEncodingSimulator() {
+        const plainTextInput = document.getElementById("plain-text");
+        const base64Output = document.getElementById("base64-output");
+        const encodeBtn = document.getElementById("encode-btn");
+        const base64Input = document.getElementById("base64-input");
+        const plainOutput = document.getElementById("plain-output");
+        const decodeBtn = document.getElementById("decode-btn");
+        const errorBox = document.getElementById("error-box");
+        const errorMessage = document.getElementById("error-message");
+
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+
+        function hideError() {
+          errorBox.classList.add("hidden");
+          errorMessage.textContent = "";
+        }
+        function showError(message) {
+          errorBox.classList.remove("hidden");
+          errorMessage.textContent = message;
+        }
+
+        function handleEncode() {
+          hideError();
+          try {
+            const text = plainTextInput.value;
+            const uint8Array = encoder.encode(text);
+            const byteString = String.fromCharCode.apply(null, uint8Array);
+            const base64String = btoa(byteString);
+            base64Output.value = base64String;
+            base64Input.value = base64String;
+            plainOutput.value = text;
+          } catch (error) {
+            showError("เกิดข้อผิดพลาดขณะ Encode: " + error.message);
+          }
+        }
+
+        function handleDecode() {
+          hideError();
+          try {
+            const base64String = base64Input.value;
+            if (base64String.trim() === "") {
+              plainOutput.value = "";
+              plainTextInput.value = "";
+              return;
+            }
+            const byteString = atob(base64String);
+            const uint8Array = new Uint8Array(byteString.length);
+            for (let i = 0; i < byteString.length; i++) {
+              uint8Array[i] = byteString.charCodeAt(i);
+            }
+            const text = decoder.decode(uint8Array);
+            plainOutput.value = text;
+            plainTextInput.value = text;
+            base64Output.value = base64String;
+          } catch (error) {
+            if (
+              error instanceof DOMException &&
+              error.name === "InvalidCharacterError"
+            ) {
+              showError(
+                "Decode ผิดพลาด: ข้อมูลที่ป้อนไม่ใช่ Base64 ที่ถูกต้อง"
+              );
+            } else if (error instanceof URIError) {
+              showError("Decode ผิดพลาด: ข้อมูลที่ป้อนไม่ใช่ UTF-8 ที่ถูกต้อง");
+            } else {
+              showError("เกิดข้อผิดพลาดขณะ Decode: " + error.message);
+            }
+          }
+        }
+
+        encodeBtn.addEventListener("click", handleEncode);
+        decodeBtn.addEventListener("click", handleDecode);
+        handleEncode();
+      }
+
+      /* * ===================================
+       * LOGIC สำหรับ ENCRYPTION SIMULATOR
+       * ===================================
+       */
+      function initEncryptionSimulator() {
+        const plainTextInput = document.getElementById("plain-text-input");
+        const passwordEncryptInput =
+          document.getElementById("password-encrypt");
+        const encryptBtn = document.getElementById("encrypt-btn");
+        const encryptedOutput = document.getElementById("encrypted-output");
+        const encryptedInput = document.getElementById("encrypted-input");
+        const passwordDecryptInput =
+          document.getElementById("password-decrypt");
+        const decryptBtn = document.getElementById("decrypt-btn");
+        const plainTextOutput = document.getElementById("plain-text-output");
+        const errorBox = document.getElementById("error-box");
+        const errorMessage = document.getElementById("error-message");
+
+        function abToB64(buffer) {
+          const bytes = new Uint8Array(buffer);
+          const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join(
+            ""
+          );
+          return window.btoa(binary);
+        }
+
+        function b64ToAb(base64) {
+          const binary_string = window.atob(base64);
+          const len = binary_string.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        async function getAESKey(password) {
+          const encodedPassword = new TextEncoder().encode(password);
+          const hashBuffer = await window.crypto.subtle.digest(
+            "SHA-256",
+            encodedPassword
+          );
+          return window.crypto.subtle.importKey(
+            "raw",
+            hashBuffer,
+            { name: "AES-GCM" },
+            false,
+            ["encrypt", "decrypt"]
+          );
+        }
+
+        async function handleEncrypt() {
+          hideError();
+          try {
+            const password = passwordEncryptInput.value;
+            if (!password) {
+              showError("กรุณาป้อนรหัสผ่าน (Key) สำหรับ Encrypt");
+              return;
+            }
+
+            const key = await getAESKey(password);
+            const dataToEncrypt = new TextEncoder().encode(
+              plainTextInput.value
+            );
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encryptedBuffer = await window.crypto.subtle.encrypt(
+              { name: "AES-GCM", iv: iv },
+              key,
+              dataToEncrypt
+            );
+
+            const combinedBuffer = new Uint8Array(
+              iv.length + encryptedBuffer.byteLength
+            );
+            combinedBuffer.set(iv, 0);
+            combinedBuffer.set(new Uint8Array(encryptedBuffer), iv.length);
+
+            const base64String = abToB64(combinedBuffer.buffer);
+            encryptedOutput.value = base64String;
+            encryptedInput.value = base64String;
+            passwordDecryptInput.value = password;
+            plainTextOutput.value = "";
+          } catch (error) {
+            showError("เกิดข้อผิดพลาดขณะ Encrypt: " + error.message);
+          }
+        }
+
+        async function handleDecrypt() {
+          hideError();
+          try {
+            const password = passwordDecryptInput.value;
+            const base64Input = encryptedInput.value;
+            if (!password) {
+              showError("กรุณาป้อนรหัสผ่าน (Key) สำหรับ Decrypt");
+              return;
+            }
+            if (!base64Input) {
+              showError("กรุณาป้อนข้อมูลที่เข้ารหัสลับ (Base64)");
+              return;
+            }
+
+            const key = await getAESKey(password);
+            const combinedBuffer = b64ToAb(base64Input);
+            const iv = combinedBuffer.slice(0, 12);
+            const encryptedData = combinedBuffer.slice(12);
+            const decryptedBuffer = await window.crypto.subtle.decrypt(
+              { name: "AES-GCM", iv: iv },
+              key,
+              encryptedData
+            );
+
+            const decryptedText = new TextDecoder().decode(decryptedBuffer);
+            plainTextOutput.value = decryptedText;
+            plainTextInput.value = decryptedText;
+            passwordEncryptInput.value = password;
+          } catch (error) {
+            showError(
+              "Decrypt ผิดพลาด: รหัสผ่าน (Key) ไม่ถูกต้อง หรือข้อมูลที่เข้ารหัสเสียหาย"
+            );
+            plainTextOutput.value = "";
+          }
+        }
+
+        function hideError() {
+          errorBox.classList.add("hidden");
+          errorMessage.textContent = "";
+        }
+        function showError(message) {
+          errorBox.classList.remove("hidden");
+          errorMessage.textContent = message;
+        }
+
+        encryptBtn.addEventListener("click", handleEncrypt);
+        decryptBtn.addEventListener("click", handleDecrypt);
+        handleEncrypt();
+      }
+    </script>
+  </body>
+</html>
